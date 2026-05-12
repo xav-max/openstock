@@ -7,7 +7,6 @@ import { sendPasswordResetEmail } from "@/lib/nodemailer/reset-password";
 
 let authInstance: ReturnType<typeof betterAuth> | null = null;
 
-
 export const getAuth = async () => {
     if(authInstance) {
         return authInstance;
@@ -48,5 +47,3 @@ export const getAuth = async () => {
 
     return authInstance;
 }
-
-export const auth = await getAuth();

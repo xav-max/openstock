@@ -32,6 +32,7 @@ jobs:
           echo "MONGODB_URI=mongodb://localhost:27017/dummy_db" >> .env.production
           echo "NODEMAILER_EMAIL=dummy@gmail.com" >> .env.production
           echo "NODEMAILER_PASSWORD=dummy_password" >> .env.production
+          echo "SKIP_EMAIL_VERIFICATION=true" >> .env.production
       # -------------------------
 
       - name: Set up QEMU (for architecture support)

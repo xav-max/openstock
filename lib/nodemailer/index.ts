@@ -6,26 +6,49 @@ if (!process.env.NODEMAILER_EMAIL || !process.env.NODEMAILER_PASSWORD) {
     console.warn('⚠️ NODEMAILER_EMAIL or NODEMAILER_PASSWORD is not set. Email functionality will not work.');
 }
 
-export const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-        user: process.env.NODEMAILER_EMAIL!,
-        pass: process.env.NODEMAILER_PASSWORD!,
-    },
-    // Add connection timeout and retry options
-    pool: true,
-    maxConnections: 1,
-    maxMessages: 3,
-})
+let transporter: nodemailer.Transporter | null = null;
+let transporterVerificationPromise: Promise<boolean> | null = null;
 
-// Verify connection on startup
-transporter.verify((error, success) => {
-    if (error) {
-        console.error('❌ Nodemailer transporter verification failed:', error);
-    } else {
-        console.log('✅ Nodemailer transporter is ready to send emails');
+export const getTransporter = () => {
+    if (transporter) {
+        return transporter;
     }
-});
+
+    transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+            user: process.env.NODEMAILER_EMAIL!,
+            pass: process.env.NODEMAILER_PASSWORD!,
+        },
+        // Add connection timeout and retry options
+        pool: true,
+        maxConnections: 1,
+        maxMessages: 3,
+    });
+
+    return transporter;
+}
+
+const verifyTransporterIfNeeded = async () => {
+    if (process.env.SKIP_EMAIL_VERIFICATION === 'true') {
+        return;
+    }
+
+    if (!transporterVerificationPromise) {
+        transporterVerificationPromise = getTransporter()
+            .verify()
+            .then(() => {
+                console.log('✅ Nodemailer transporter is ready to send emails');
+                return true;
+            })
+            .catch((error) => {
+                console.error('❌ Nodemailer transporter verification failed:', error);
+                return false;
+            });
+    }
+
+    await transporterVerificationPromise;
+}
 
 export const sendWelcomeEmail = async ({ email, name, intro }: WelcomeEmailData) => {
     try {
@@ -45,7 +68,8 @@ export const sendWelcomeEmail = async ({ email, name, intro }: WelcomeEmailData)
             html: htmlTemplate,
         }
 
-        const info = await transporter.sendMail(mailOptions);
+        await verifyTransporterIfNeeded();
+        const info = await getTransporter().sendMail(mailOptions);
         console.log('✅ Welcome email sent successfully:', info.messageId);
         return info;
     } catch (error) {
@@ -74,7 +98,8 @@ export const sendNewsSummaryEmail = async (
             html: htmlTemplate,
         };
 
-        const info = await transporter.sendMail(mailOptions);
+        await verifyTransporterIfNeeded();
+        const info = await getTransporter().sendMail(mailOptions);
         console.log('✅ News summary email sent successfully:', info.messageId);
         return info;
     } catch (error) {
