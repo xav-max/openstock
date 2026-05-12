@@ -29,6 +29,9 @@ jobs:
           echo "INNGEST_SIGNING_KEY=dummy_build_key" >> .env.production
           echo "BETTER_AUTH_SECRET=dummy_build_key" >> .env.production
           echo "BETTER_AUTH_URL=http://localhost:3000" >> .env.production
+          echo "MONGODB_URI=mongodb://localhost:27017/dummy_db" >> .env.production
+          echo "NODEMAILER_EMAIL=dummy@gmail.com" >> .env.production
+          echo "NODEMAILER_PASSWORD=dummy_password" >> .env.production
       # -------------------------
 
       - name: Set up QEMU (for architecture support)
