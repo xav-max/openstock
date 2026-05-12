@@ -1,4 +1,4 @@
-import { transporter } from "@/lib/nodemailer";
+import { getTransporter } from "@/lib/nodemailer";
 
 const escapeHtml = (value: string) =>
     value
@@ -40,7 +40,7 @@ export const sendPasswordResetEmail = async (
             </div>
         `;
 
-        const info = await transporter.sendMail({
+        const info = await getTransporter().sendMail({
             from: `"Openstock" <${process.env.NODEMAILER_EMAIL}>`,
             to: email,
             subject: 'Reset your Openstock password',

@@ -1,17 +1,18 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+const sendMail = vi.fn();
+
 vi.mock('@/lib/nodemailer', () => ({
-    transporter: {
-        sendMail: vi.fn(),
-    },
+    getTransporter: () => ({
+        sendMail,
+    }),
 }));
 
-import { transporter } from '@/lib/nodemailer';
 import { sendPasswordResetEmail } from '@/lib/nodemailer/reset-password';
 
 describe('sendPasswordResetEmail', () => {
     const originalEnv = { ...process.env };
-    const sendMailMock = vi.mocked(transporter.sendMail);
+    const sendMailMock = vi.mocked(sendMail);
 
     beforeEach(() => {
         process.env = {

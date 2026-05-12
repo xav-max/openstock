@@ -9,6 +9,8 @@ import FooterLink from '@/components/forms/FooterLink';
 import OpenDevSocietyBranding from '@/components/OpenDevSocietyBranding';
 import { requestPasswordResetEmail } from '@/lib/actions/auth.actions';
 
+export const dynamic = 'force-dynamic';
+
 type ForgotPasswordFormData = {
     email: string;
 };

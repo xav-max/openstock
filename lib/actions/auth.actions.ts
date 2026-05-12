@@ -1,11 +1,12 @@
 'use server';
 
-import { auth } from "@/lib/better-auth/auth";
+import { getAuth } from "@/lib/better-auth/auth";
 import { inngest } from "@/lib/inngest/client";
 import { headers } from "next/headers";
 
 export const signUpWithEmail = async ({ email, password, fullName, country, investmentGoals, riskTolerance, preferredIndustry }: SignUpFormData) => {
     try {
+        const auth = await getAuth();
         const response = await auth.api.signUpEmail({ body: { email, password, name: fullName } })
 
         if (response) {
@@ -31,6 +32,7 @@ export const signUpWithEmail = async ({ email, password, fullName, country, inve
 
 export const signInWithEmail = async ({ email, password }: SignInFormData) => {
     try {
+        const auth = await getAuth();
         const response = await auth.api.signInEmail({ body: { email, password } })
 
         // Update lastActiveAt
@@ -64,6 +66,7 @@ export const requestPasswordResetEmail = async ({ email }: { email: string }) =>
     }
 
     try {
+        const auth = await getAuth();
         const configuredBaseUrl = process.env.BETTER_AUTH_URL;
         const baseUrl = configuredBaseUrl || (
             process.env.NODE_ENV !== 'production' ? 'http://localhost:3000' : null
@@ -94,6 +97,7 @@ export const resetPasswordWithToken = async (
     { token, newPassword }: { token: string; newPassword: string }
 ) => {
     try {
+        const auth = await getAuth();
         await auth.api.resetPassword({
             body: {
                 token,
@@ -110,10 +114,10 @@ export const resetPasswordWithToken = async (
 
 export const signOut = async () => {
     try {
+        const auth = await getAuth();
         await auth.api.signOut({ headers: await headers() });
     } catch (e) {
         console.log('Sign out failed', e)
         return { success: false, error: 'Sign out failed' }
     }
 }
-
